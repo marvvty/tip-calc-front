@@ -12,7 +12,7 @@ type Props = {
   initialData: CreatedAccount | null;
   onReturn: () => void;
   onSubmit: (data: CreateCheckDto) => void;
-  onCalculate: () => Promise<any>;
+  onCalculate?: () => Promise<any>;
 };
 
 export function AccountForm({
