@@ -6,7 +6,7 @@ type Props = {
 
 export function CalculationResults({ calculationResult }: Props) {
   return (
-    <div className="flex flex-col gap-2 border border-gray-500 p-5 rounded-xl min-w-64">
+    <div className="flex flex-col gap-2 border border-gray-800 p-5 rounded-xl min-w-64">
       <h3 className="font-bold">Calculation Results</h3>
 
       <div className="pb-2">
@@ -27,9 +27,6 @@ export function CalculationResults({ calculationResult }: Props) {
             <p>Amount to pay: {item.calculated_share.toFixed(2)}</p>
             {item.participant.custom_precent && (
               <p>Custom tip: {item.participant.custom_precent}%</p>
-            )}
-            {item.participant.custom_amount && (
-              <p>Custom amount: {item.participant.custom_amount.toFixed(2)}</p>
             )}
           </div>
         ))}

@@ -13,7 +13,7 @@ export async function create(data: CreateCheckDto): Promise<CreatedAccount> {
     body: JSON.stringify(data),
   });
 
-  if (!res) {
+  if (!res.ok) {
     throw new Error("cannot create data");
   }
 
@@ -23,7 +23,7 @@ export async function create(data: CreateCheckDto): Promise<CreatedAccount> {
 export async function getAll() {
   const res = await fetch(`${baseUrl}/accounts`);
 
-  if (!res) {
+  if (!res.ok) {
     throw new Error("cannot get all data");
   }
 
@@ -33,7 +33,7 @@ export async function getAll() {
 export async function getOne(id: string) {
   const res = await fetch(`${baseUrl}/accounts/${id}`);
 
-  if (!res) {
+  if (!res.ok) {
     throw new Error("cannot get one");
   }
 
@@ -42,12 +42,12 @@ export async function getOne(id: string) {
 
 export async function update(id: string, data: UpdateCheckDto) {
   const res = await fetch(`${baseUrl}/accounts/${id}`, {
-    method: "PATСH",
+    method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
 
-  if (!res) {
+  if (!res.ok) {
     throw new Error("failed to update");
   }
 
@@ -60,7 +60,7 @@ export async function deleteItem(id: string) {
     headers: { "Content-Type": "application/json" },
   });
 
-  if (!res) {
+  if (!res.ok) {
     throw new Error("cannot delete this one");
   }
 
@@ -70,7 +70,7 @@ export async function deleteItem(id: string) {
 export async function calculateItem(id: string) {
   const res = await fetch(`${baseUrl}/accounts/${id}/calc`);
 
-  if (!res) {
+  if (!res.ok) {
     throw new Error("something got wrong");
   }
 

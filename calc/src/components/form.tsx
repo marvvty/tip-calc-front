@@ -1,11 +1,26 @@
-import type { CreateCheckDto, CalculationResult } from "../types/types";
-import { useState } from "react";
-import { calculateItem, create } from "../api/requests";
+import type {
+  CreateCheckDto,
+  CalculationResult,
+  CreatedAccount,
+} from "../types/types";
+import { useState, useEffect } from "react";
 import { ParticipantsList } from "./List";
 import { CalculationResults } from "./calcResult";
 import { FormInputs } from "./input";
 
-export function AccountForm() {
+type Props = {
+  initialData: CreatedAccount | null;
+  onReturn: () => void;
+  onSubmit: (data: CreateCheckDto) => void;
+  onCalculate: () => Promise<any>;
+};
+
+export function AccountForm({
+  initialData,
+  onReturn,
+  onSubmit,
+  onCalculate,
+}: Props) {
   const [form, setForm] = useState<CreateCheckDto>({
     base_amount: 100,
     tip_precent: 5,
@@ -16,6 +31,17 @@ export function AccountForm() {
   });
   const [calculationResult, setCalculationResult] =
     useState<CalculationResult | null>(null);
+
+  useEffect(() => {
+    if (initialData) {
+      setForm({
+        base_amount: Number(initialData.base_amount),
+        tip_precent: initialData.tip_precent,
+        people_count: initialData.people_count,
+        participants: initialData.participants,
+      });
+    }
+  }, [initialData]);
 
   const handleParticipantChange = (
     index: number,
@@ -29,11 +55,17 @@ export function AccountForm() {
   };
 
   const addParticipant = () => {
-    setForm((prev) => ({
-      ...prev,
-      people_count: prev.people_count + 1,
-      participants: [...prev.participants, { name: "" }],
-    }));
+    setForm((prev) => {
+      const newParticipants = [
+        ...prev.participants,
+        { name: "", custom_precent: undefined, custom_amount: undefined },
+      ];
+      return {
+        ...prev,
+        people_count: newParticipants.length,
+        participants: newParticipants,
+      };
+    });
   };
 
   const removeParticipant = (index: number) => {
@@ -63,36 +95,44 @@ export function AccountForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const check = await create(form);
-    const calculation = await calculateItem(check.id.toString());
-    setCalculationResult(calculation);
+    await onSubmit(form);
+  };
 
-    setForm({
-      base_amount: 0,
-      tip_precent: 0,
-      people_count: 1,
-      participants: [
-        { name: "", custom_precent: undefined, custom_amount: undefined },
-      ],
-    });
+  const handleCalculate = async () => {
+    if (!onCalculate) return;
+    try {
+      const result = await onCalculate();
+      setCalculationResult(result);
+    } catch (error) {
+      console.error("Calculation failed:", error);
+    }
   };
 
   return (
-    <div className="flex flex-row gap-4">
-      <FormInputs
-        form={form}
-        onChange={handleChange}
-        onAddParticipant={addParticipant}
-        onSubmit={handleSubmit}
-      />
-      <ParticipantsList
-        participants={form.participants}
-        onChange={handleParticipantChange}
-        onRemove={removeParticipant}
-      />
-      {calculationResult && (
-        <CalculationResults calculationResult={calculationResult} />
-      )}
-    </div>
+    <>
+      <button
+        className="border border-indigo-600 bg-black text-white rounded-lg py-1 cursor-pointer hover:border-indigo-800 hover:-translate-y-0.5 hover:scale-100 transition w-30"
+        onClick={onReturn}
+      >
+        return
+      </button>
+      <div className="flex flex-row gap-4 ">
+        <FormInputs
+          form={form}
+          onChange={handleChange}
+          onAddParticipant={addParticipant}
+          onSubmit={handleSubmit}
+          onCalculate={handleCalculate}
+        />
+        <ParticipantsList
+          participants={form.participants}
+          onChange={handleParticipantChange}
+          onRemove={removeParticipant}
+        />
+        {calculationResult && (
+          <CalculationResults calculationResult={calculationResult} />
+        )}
+      </div>
+    </>
   );
 }

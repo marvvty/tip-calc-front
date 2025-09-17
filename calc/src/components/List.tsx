@@ -14,7 +14,9 @@ type Props = {
 export function ParticipantsList({ participants, onChange, onRemove }: Props) {
   return (
     <div className="flex flex-col items-center gap-2">
-      <h3>Participants</h3>
+      <h3 className="border-b border-gray-800 w-30  hover:-translate-y-1 hover:scale-100 transition">
+        Participants
+      </h3>
       {participants.map((p, index) => (
         <ParticipantInput
           key={index}
