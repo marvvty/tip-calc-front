@@ -23,7 +23,7 @@ const initialState: CheckState = {
   showLoading: false,
 };
 
-export const fetchCheks = createAsyncThunk<CreateCheckDto[]>(
+export const fetchCheks = createAsyncThunk<CreatedAccount[]>(
   "checks/fetchAll",
   async () => await api.getAll()
 );
@@ -67,8 +67,29 @@ const checkSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchCheks.pending, (state) => {
-      state.showLoading = true;
-    });
+    builder
+      .addCase(fetchCheks.pending, (state) => {
+        state.showLoading = true;
+      })
+      .addCase(fetchCheks.fulfilled, (state, action) => {
+        state.checks = action.payload;
+        state.showLoading = false;
+      })
+      .addCase(createCheck.fulfilled, (state, action) => {
+        state.checks.push(action.payload);
+        state.selectedCheck = action.payload;
+      })
+      .addCase(updateCheck.fulfilled, (state, action) => {
+        state.checks = state.checks.map((c) =>
+          c.id === action.payload.id ? action.payload : c
+        );
+        state.selectedCheck = action.payload;
+      })
+      .addCase(deleteCheck.fulfilled, (state, action) => {
+        state.checks = state.checks.filter((ch) => ch.id != action.payload);
+      });
   },
 });
+
+export const { setSelectedCheck, toogleForm } = checkSlice.actions;
+export default checkSlice.reducer;
